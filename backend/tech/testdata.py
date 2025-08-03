@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from authentication import make_test_user
 
+from discord.models import DiscordUser
 from eveonline.models import (
     EveAlliance,
     EveCorporation,
@@ -62,7 +63,21 @@ def disable_signals():
 
 def setup_users() -> User:
     user1 = make_test_user(1, "AdminDude", True)
-    make_test_user(2, "TesterDude", False)
+    user2 = make_test_user(2, "TesterDude", False)
+    DiscordUser.objects.get_or_create(
+        user=user1,
+        defaults={
+            "id": "123456789",
+            "discord_tag": "AdminDude#0"
+        },
+    )
+    DiscordUser.objects.get_or_create(
+        user=user2,
+        defaults={
+            "id": "987654321",
+            "discord_tag": "TesterDude#0"
+        },
+    )    
     return user1
 
 
@@ -95,7 +110,7 @@ def setup_orgs(user: User) -> EveCharacter:
     main, _ = EveCharacter.objects.get_or_create(
         character_id=123456,
         defaults={
-            "character_name": "Test Pilot",
+            "character_name": "Test Main Pilot",
         },
     )
     setup_char(main, megacorp, user)
@@ -113,7 +128,7 @@ def setup_orgs(user: User) -> EveCharacter:
     alt, _ = EveCharacter.objects.get_or_create(
         character_id=123457,
         defaults={
-            "character_name": "Alt Pilot",
+            "character_name": "Test Alt Pilot",
         },
     )
     setup_char(alt, megacorp, user)
